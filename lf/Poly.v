@@ -148,13 +148,13 @@ Inductive grumble (X:Type) : Type :=
 
 (** Which of the following are well-typed elements of [grumble X] for
     some type [X]?  (Add YES or NO to each line.)
-      - [d (b a 5)]
-      - [d mumble (b a 5)]
-      - [d bool (b a 5)]
-      - [e bool true]
-      - [e mumble (b c 0)]
-      - [e bool (b c 0)]
-      - [c]  *)
+      YES - [d (b a 5)]
+      YES - [d mumble (b a 5)]
+      NO  - [d bool (b a 5)]
+      YES - [e bool true]
+      YES - [e mumble (b c 0)]
+      NO  - [e bool (b c 0)]
+      NO  - [c]  *)
 (* FILL IN HERE *)
 End MumbleGrumble.
 
@@ -389,18 +389,30 @@ Definition list123''' := [1; 2; 3].
 
 Theorem app_nil_r : forall (X:Type), forall l:list X,
   l ++ [] = l.
-Proof.
-  (* FILL IN HERE *) Admitted.
+Proof. intros. induction l. 
+  - reflexivity. 
+  - simpl. rewrite IHl. reflexivity.
+Qed.
 
 Theorem app_assoc : forall A (l m n:list A),
   l ++ m ++ n = (l ++ m) ++ n.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros. induction l. reflexivity.
+  assert ((x :: l) = [x] ++ l). reflexivity.
+  rewrite H.
+  assert (([x] ++ l) ++ m ++ n = [x] ++ l ++ m ++ n). reflexivity.
+  rewrite H0. rewrite IHl.
+  assert (([x] ++ l) ++ m = [x] ++ l ++ m). reflexivity.
+  rewrite H1. reflexivity.
+Qed.
 
 Lemma app_length : forall (X:Type) (l1 l2 : list X),
   length (l1 ++ l2) = length l1 + length l2.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros. induction l1. 
+  - reflexivity.
+  - simpl. rewrite IHl1. reflexivity.
+Qed.
 (** [] *)
 
 (** **** Exercise: 2 stars, standard, optional (more_poly_exercises)
@@ -410,12 +422,26 @@ Proof.
 Theorem rev_app_distr: forall X (l1 l2 : list X),
   rev (l1 ++ l2) = rev l2 ++ rev l1.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros. induction l1. rewrite app_nil_r. reflexivity.
+  assert (x :: l1 = [x] ++ l1). reflexivity.
+  rewrite H.
+  assert (rev ([x] ++ l1) = rev l1 ++ [x]). reflexivity.
+  rewrite H0. rewrite <- app_assoc.
+  assert (rev ([x] ++ l1 ++ l2) = rev (l1 ++ l2) ++ [x]). reflexivity.
+  rewrite H1. rewrite IHl1. rewrite <- app_assoc.
+  reflexivity.
+Qed.
 
 Theorem rev_involutive : forall X : Type, forall l : list X,
   rev (rev l) = l.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros. induction l. reflexivity.
+  assert (x :: l = [x] ++ l). reflexivity.
+  rewrite H. assert (rev ([x] ++ l) = rev l ++ [x]). reflexivity.
+  rewrite H0. assert (rev (rev l ++ [x]) = [x] ++ rev (rev (l))).
+  rewrite rev_app_distr. reflexivity.
+  rewrite H1. rewrite IHl. reflexivity.
+Qed.
 (** [] *)
 
 (* ================================================================= *)
@@ -499,13 +525,15 @@ Fixpoint combine {X Y : Type} (lx : list X) (ly : list Y)
     Fill in the definition of [split] below.  Make sure it passes the
     given unit test. *)
 
-Fixpoint split {X Y : Type} (l : list (X*Y)) : (list X) * (list Y)
-  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *). Admitted.
+Fixpoint split {X Y : Type} (l : list (X*Y)) : (list X) * (list Y) :=
+  match l with 
+  | [] => ([], [])
+  | (f, s) :: t => (([f] ++ fst (split t)), ([s] ++ snd (split t)))
+  end.
 
 Example test_split:
   split [(1,false);(2,false)] = ([1;2],[false;false]).
-Proof.
-(* FILL IN HERE *) Admitted.
+Proof. reflexivity. Qed.
 (** [] *)
 
 (* ================================================================= *)
@@ -554,8 +582,11 @@ Proof. reflexivity. Qed.
     [hd_error] function from the last chapter. Be sure that it
     passes the unit tests below. *)
 
-Definition hd_error {X : Type} (l : list X) : option X
-  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *). Admitted.
+Definition hd_error {X : Type} (l : list X) : option X := 
+  match l with
+  | [] => None
+  | h :: t => Some h
+  end.
 
 (** Once again, to force the implicit arguments to be explicit,
     we can use [@] before the name of the function. *)
@@ -563,9 +594,9 @@ Definition hd_error {X : Type} (l : list X) : option X
 Check @hd_error : forall X : Type, list X -> option X.
 
 Example test_hd_error1 : hd_error [1;2] = Some 1.
- (* FILL IN HERE *) Admitted.
+Proof. reflexivity. Qed.
 Example test_hd_error2 : hd_error  [[1];[2]]  = Some [1].
- (* FILL IN HERE *) Admitted.
+Proof. reflexivity. Qed.
 (** [] *)
 
 (* ################################################################# *)
@@ -682,16 +713,16 @@ Proof. reflexivity. Qed.
     and returns a list of just those that are even and greater than
     7. *)
 
-Definition filter_even_gt7 (l : list nat) : list nat
-  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *). Admitted.
+Definition filter_even_gt7 (l : list nat) : list nat :=
+  filter (fun n: nat => (7 <=? n) && (even n)) l.
 
 Example test_filter_even_gt7_1 :
   filter_even_gt7 [1;2;6;9;10;3;12;8] = [10;12;8].
- (* FILL IN HERE *) Admitted.
+Proof. reflexivity. Qed.
 
 Example test_filter_even_gt7_2 :
   filter_even_gt7 [5;2;6;19;129] = [].
- (* FILL IN HERE *) Admitted.
+Proof. reflexivity. Qed.
 (** [] *)
 
 (** **** Exercise: 3 stars, standard (partition)
@@ -711,13 +742,13 @@ Example test_filter_even_gt7_2 :
 Definition partition {X : Type}
                      (test : X -> bool)
                      (l : list X)
-                   : list X * list X
-  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *). Admitted.
+                   : list X * list X :=
+  (filter test l, filter (fun n: X => negb (test n)) l).
 
 Example test_partition1: partition odd [1;2;3;4;5] = ([1;3;5], [2;4]).
-(* FILL IN HERE *) Admitted.
+Proof. reflexivity. Qed.
 Example test_partition2: partition (fun x => false) [5;9;0] = ([], [5;9;0]).
-(* FILL IN HERE *) Admitted.
+Proof. reflexivity. Qed.
 (** [] *)
 
 (* ================================================================= *)
@@ -764,10 +795,23 @@ Proof. reflexivity. Qed.
     Show that [map] and [rev] commute.  You may need to define an
     auxiliary lemma. *)
 
+Lemma map_distr: forall (X Y : Type) (f : X -> Y) (l1 : list X) (l2 : list X), 
+  map f (l1 ++ l2) = map f l1 ++ map f l2.
+Proof. intros. induction l1. reflexivity.
+  assert (x :: l1 = [x] ++ l1). reflexivity. rewrite H.
+  simpl. rewrite IHl1. reflexivity.
+Qed.
+
 Theorem map_rev : forall (X Y : Type) (f : X -> Y) (l : list X),
   map f (rev l) = rev (map f l).
-Proof.
-  (* FILL IN HERE *) Admitted.
+Proof. intros. induction l. reflexivity.
+  assert (map f (x :: l) = map f [x] ++ map f l).
+  reflexivity. rewrite H.
+  assert (rev (map f [x] ++ map f l) = rev (map f l) ++ [f x]).
+  reflexivity. rewrite H0. rewrite <- IHl.
+  assert (rev (x :: l) = rev l ++ [x]). reflexivity.
+  rewrite H1. rewrite map_distr. reflexivity.
+Qed.
 (** [] *)
 
 (** **** Exercise: 2 stars, standard, especially useful (flat_map)
@@ -783,13 +827,16 @@ Proof.
 *)
 
 Fixpoint flat_map {X Y: Type} (f: X -> list Y) (l: list X)
-                   : list Y
-  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *). Admitted.
+                   : list Y :=
+  match l with
+  | [] => []
+  | h :: t => f h ++ flat_map f t
+  end.
 
 Example test_flat_map1:
   flat_map (fun n => [n;n;n]) [1;5;4]
   = [1; 1; 1; 5; 5; 5; 4; 4; 4].
- (* FILL IN HERE *) Admitted.
+  Proof. reflexivity. Qed.
 (** [] *)
 
 (** Lists are not the only inductive type for which [map] makes sense.
@@ -943,8 +990,9 @@ Proof. reflexivity. Qed.
 
 Theorem fold_length_correct : forall X (l : list X),
   fold_length l = length l.
-Proof.
-(* FILL IN HERE *) Admitted.
+Proof. intros. induction l. reflexivity.
+  simpl. rewrite <- IHl. reflexivity.
+Qed.
 (** [] *)
 
 (** **** Exercise: 3 stars, standard (fold_map)
@@ -959,6 +1007,11 @@ Definition fold_map {X Y: Type} (f: X -> Y) (l: list X) : list Y
    [fold_map] is correct, and prove it.  (Hint: again, remember that
    [reflexivity] simplifies expressions a bit more aggressively than
    [simpl].) *)
+
+Theorem fold_map_correct: forall {X Y: Type} (f: X -> Y) (l: list X),
+  map f l = fold_map f l.
+Proof. intros. induction l.
+Abort.
 
 (* FILL IN HERE *)
 
@@ -990,7 +1043,7 @@ Definition prod_curry {X Y Z : Type}
     the theorems below to show that the two are inverses. *)
 
 Definition prod_uncurry {X Y Z : Type}
-  (f : X -> Y -> Z) (p : X * Y) : Z
+  (f : X -> Y -> Z) (p : X * Y) : Z 
   (* REPLACE THIS LINE WITH ":= _your_definition_ ." *). Admitted.
 
 (** As a (trivial) example of the usefulness of currying, we can use it
@@ -1009,13 +1062,13 @@ Theorem uncurry_curry : forall (X Y Z : Type)
                         (f : X -> Y -> Z)
                         x y,
   prod_curry (prod_uncurry f) x y = f x y.
-Proof.
+Proof. intros. unfold prod_curry. 
   (* FILL IN HERE *) Admitted.
 
 Theorem curry_uncurry : forall (X Y Z : Type)
                         (f : (X * Y) -> Z) (p : X * Y),
   prod_uncurry (prod_curry f) p = f p.
-Proof.
+Proof. intros. unfold prod_curry.
   (* FILL IN HERE *) Admitted.
 (** [] *)
 

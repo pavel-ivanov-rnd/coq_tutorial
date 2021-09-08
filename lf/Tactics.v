@@ -73,7 +73,7 @@ Theorem silly_ex : forall p,
   even p = true ->
   odd (S p) = true.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros. apply H0. apply H. apply H1. Qed.
 (** [] *)
 
 (** To use the [apply] tactic, the (conclusion of the) fact
@@ -108,7 +108,8 @@ Proof.
 Theorem rev_exercise1 : forall (l l' : list nat),
   l = rev l' ->
   l' = rev l.
-Proof.
+Proof. 
+
   (* FILL IN HERE *) Admitted.
 (** [] *)
 
@@ -192,7 +193,8 @@ Example trans_eq_exercise : forall (n m o p : nat),
      (n + p) = m ->
      (n + p) = (minustwo o).
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros. transitivity m. apply H0. apply H.
+Qed.
 (** [] *)
 
 (* ################################################################# *)
@@ -279,7 +281,10 @@ Example injection_ex3 : forall (X : Type) (x y z : X) (l j : list X),
   j = z :: l ->
   x = y.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros. injection H. rewrite H0. 
+  intros. rewrite H2. symmetry. 
+  injection H1 as H3. rewrite H3. reflexivity.
+Qed.
 (** [] *)
 
 (** So much for injectivity of constructors.  What about disjointness? *)
@@ -327,7 +332,8 @@ Example discriminate_ex3 :
     x :: y :: l = [] ->
     x = z.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  discriminate.
+Qed.
 (** [] *)
 
 (** For a slightly more involved example, we can use [discriminate] to
@@ -592,8 +598,14 @@ Proof.
 (** **** Exercise: 2 stars, standard (eqb_true) *)
 Theorem eqb_true : forall n m,
   n =? m = true -> n = m.
-Proof.
-  (* FILL IN HERE *) Admitted.
+Proof. intros n. induction n. 
+    destruct m. 
+      reflexivity.
+      discriminate.
+    destruct m. 
+      discriminate.
+      intros. simpl in H. apply f_equal. apply IHn in H. apply H.
+Qed.
 (** [] *)
 
 (** **** Exercise: 2 stars, advanced (eqb_true_informal)
@@ -615,7 +627,16 @@ Theorem plus_n_n_injective : forall n m,
   n + n = m + m ->
   n = m.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intro n. induction n. 
+  -intros. destruct m.
+  --simpl in H. apply H.
+  --simpl in H. discriminate.
+  -intros. destruct m.
+  --simpl in H. discriminate.
+  --simpl in H. do 2 rewrite <- plus_n_Sm in H.
+      do 2 apply S_injective in H. apply IHn in H as goal. 
+      apply eq_implies_succ_equal in goal. apply goal.
+Qed.
 (** [] *)
 
 (** The strategy of doing fewer [intros] before an [induction] to
@@ -721,7 +742,7 @@ Proof.
 Theorem nth_error_after_last: forall (n : nat) (X : Type) (l : list X),
   length l = n ->
   nth_error l n = None.
-Proof.
+Proof. 
   (* FILL IN HERE *) Admitted.
 (** [] *)
 
