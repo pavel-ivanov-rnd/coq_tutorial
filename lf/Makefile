@@ -7,7 +7,7 @@
 ##         #     GNU Lesser General Public License Version 2.1          ##
 ##         #     (see LICENSE file for the text of the license)         ##
 ##########################################################################
-## GNUMakefile for Coq 8.13.1
+## GNUMakefile for Coq 8.13.2
 
 # For debugging purposes (must stay here, don't move below)
 INITIAL_VARS := $(.VARIABLES)
@@ -44,7 +44,7 @@ HASNATDYNLINK     := $(COQMF_HASNATDYNLINK)
 OCAMLWARN         := $(COQMF_WARN)
 
 Makefile.conf: _CoqProject
-	coq_makefile -f _CoqProject AltAutoTest.v AltAuto.v AutoTest.v Auto.v BasicsTest.v Basics.v BibTest.v Bib.v ExtractionTest.v Extraction.v ImpCEvalFunTest.v ImpCEvalFun.v ImpParserTest.v ImpParser.v ImpTest.v Imp.v IndPrinciplesTest.v IndPrinciples.v IndPropTest.v IndProp.v InductionTest.v Induction.v ListsTest.v Lists.v LogicTest.v Logic.v MapsTest.v Maps.v PolyTest.v Poly.v PostscriptTest.v Postscript.v PrefaceTest.v Preface.v ProofObjectsTest.v ProofObjects.v RelTest.v Rel.v TacticsTest.v Tactics.v -o Makefile
+	coq_makefile -f _CoqProject AltAuto.v AltAutoTest.v Auto.v AutoTest.v Basics.v BasicsTest.v Bib.v BibTest.v Extraction.v ExtractionTest.v Imp.v ImpCEvalFun.v ImpCEvalFunTest.v ImpParser.v ImpParserTest.v ImpTest.v IndPrinciples.v IndPrinciplesTest.v IndProp.v IndPropTest.v Induction.v InductionTest.v Lists.v ListsTest.v Logic.v LogicTest.v Maps.v MapsTest.v Poly.v PolyTest.v Postscript.v PostscriptTest.v Preface.v PrefaceTest.v ProofObjects.v ProofObjectsTest.v Rel.v RelTest.v Tactics.v TacticsTest.v -o Makefile
 
 # This file can be created by the user to hook into double colon rules or
 # add any other Makefile code he may need
@@ -218,7 +218,7 @@ COQDOCLIBS?=$(COQLIBS_NOML)
 # The version of Coq being run and the version of coq_makefile that
 # generated this makefile
 COQ_VERSION:=$(shell $(COQC) --print-version | cut -d " " -f 1)
-COQMAKEFILE_VERSION:=8.13.1
+COQMAKEFILE_VERSION:=8.13.2
 
 COQSRCLIBS?= $(foreach d,$(COQ_SRC_SUBDIRS), -I "$(COQLIB)/$(d)")
 
